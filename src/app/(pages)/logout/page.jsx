@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect,useState } from 'react';
-import { logout } from '@/app/lib/authUtilities';
+import { logout } from '@/app/lib/appwriteUtilities';
 import useAuth from '@/app/context/useAuth';
 import { useRouter } from 'next/navigation';
 

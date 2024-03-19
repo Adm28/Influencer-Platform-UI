@@ -7,7 +7,7 @@ import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { Label } from "@/app/components/ui/label"
-import { loginUsingEmail, loginOAuthGithub, logout, isLoggedIn } from '@/app/lib/authUtilities';
+import { loginUsingEmail, loginOAuthGithub, logout, isLoggedIn } from '@/app/lib/appwriteUtilities';
 import { useState, useLayoutEffect } from "react"
 import { useRouter } from 'next/navigation';
 import useAuth from '@/app/context/useAuth';
@@ -26,12 +26,6 @@ const LoginForm = () => {
     const [name, setName] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
 
-    useLayoutEffect (() => {
-        console.log("uselayouteffect loginform");
-        if(authStatus){
-            router.replace("/dashboard");
-        } 
-    },[])
     
     const handleGithubSignIn = async () => {
         setLoading(true)
@@ -52,22 +46,41 @@ const LoginForm = () => {
         console.log("handling login user through email")
         console.log("email : ", email)
         console.log("password : ", password)
-        try {
-            await loginUsingEmail(email, password)
-            const loginStatus = await isLoggedIn()
-            console.log("loginstatus : ",loginStatus)
-            if(loginStatus) {
-                setAuthStatus(true)
-                setEmail('')
-                setPassword('')
-            }
+        // await loginUsingEmail(email,password)
+        loginUsingEmail(email,password).then((response) => {
+                console.log("handleLoginEmail Response : ", response)
+                if(response) {
+                    setAuthStatus(true)
+                    console.log("SetAuthStatus : ",authStatus)
+                }
+            }).catch((ex) => {
+                 console.log("exception handleloginemail loginusingemail ", ex);
+            }).finally(() => {
+                console.log("loginusingemail final block")
+                setLoading(false)
+            })
+
+        // try {
+        //     loginUsingEmail(email,password).then((response) => {
+        //         console.log("handleLoginEmail Response : ", response)
+        //     }).catch((ex) => {
+        //         console.log("exception handleloginemail loginusingemial ", ex)
+        //     })
+        //     // await loginUsingEmail(email, password)
         
-        } catch (ex) {
-            console.log("handleLoginEmail error : ", ex)
-            setErrorMessage(String(ex.message))
-        } finally {
-            setLoading(false)
-        }
+        //     // const loginStatus = await isLoggedIn()
+        //     // console.log("loginstatus in handleLoginEmail: ",loginStatus)
+        //     // if(loginStatus) {
+        //     //     // setAuthStatus(true)
+        //     //     setEmail('')
+        //     //     setPassword('')
+        
+        // } catch (ex) {
+        //     console.log("handleLoginEmail error : ", ex)
+        //     setErrorMessage(String(ex.message))
+        // } finally {
+        //     setLoading(false)
+        // }
     }
 
     const handleSignOut = async () => {

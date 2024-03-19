@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/pagination";
 import { Navigation } from "@/components/navigation";
 import { Twitter } from "lucide-react";
-import {getCurrentUser} from "@/app/lib/authUtilities"
+import {getCurrentUser} from "@/app/lib/appwriteUtilities"
 import { useState,useEffect } from "react";
 
 export default function DashboardPage() {

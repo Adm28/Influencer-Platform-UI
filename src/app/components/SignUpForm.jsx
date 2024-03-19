@@ -7,8 +7,7 @@ import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { Label } from "@/app/components/ui/label"
-import  Link  from "next/link"
-import { loginUsingEmail, loginOAuthGithub, logout, getCurrentUser,signupUsingEmail, isLoggedIn } from '@/app/lib/authUtilities';
+import { loginUsingEmail, loginOAuthGithub,  getCurrentUser,signupUsingEmail, isLoggedIn } from '@/app/lib/appwriteUtilities';
 import {useState, useLayoutEffect} from "react"
 import { useRouter } from 'next/navigation';
 config.autoAddCss = false
@@ -22,20 +21,21 @@ const SignUpForm = () => {
   const [isLoading, setLoading] = useState(false)
   const [name , setName] = useState("")
   const [errorMessage, setErrorMessage]  = useState("")
+  const [signUpSuccess , setSignUpSuccess] = useState(false)
 
-  useLayoutEffect (() => {
-    console.log("page getting rerendered again")
-    isLoggedIn().then((status) => {
-      console.log("status of authentication : ", status)
-      if(!!status){
-        router.push("/dashboard")
-      }
-      //  router.replace("/dashboard")
-    }).catch((ex) => {
-      console.log("erroe occured during layout effect",ex)
-    })
+  // useLayoutEffect (() => {
+  //   console.log("page getting rerendered again")
+  //   isLoggedIn().then((status) => {
+  //     console.log("status of authentication : ", status)
+  //     if(!!status){
+  //       router.push("/")
+  //     }
+  //     //  router.replace("/dashboard")
+  //   }).catch((ex) => {
+  //     console.log("erroe occured during layout effect",ex)
+  //   })
 
-  })
+  // })
   
 
   const handleGithubSignIn = async() => {
@@ -46,7 +46,7 @@ const SignUpForm = () => {
     try{
       let signInStatus = loginOAuthGithub()
       if(!!signInStatus) {
-        router.push('/dashboard')
+        router.push('/')
       }
     }catch(ex) {
       console.log("Error occured during signup through github", ex)
@@ -63,9 +63,10 @@ const SignUpForm = () => {
     console.log("email : " , email)
     console.log("password : ",password)
     try{
-      await signupUsingEmail(email,password)
-      setEmail('')
-      setPassword('')
+      const userInfo = await signupUsingEmail(email,password)
+      if(userInfo) {
+        setSignUpSuccess(true)
+      }
     } catch(ex) {
         console.log("handleRegisterUser error : ",ex)
         setErrorMessage(String(ex.message))
@@ -73,17 +74,6 @@ const SignUpForm = () => {
       setLoading(false)
     }
   }
-
-  const handleSignOut = async() => {
-    try{
-      await logout()
-      router.replace("/")
-    } catch(ex) {
-      console.log("error during logout", ex)
-    }
-  }
-  
-
   
   return (
     <div>
@@ -146,12 +136,17 @@ const SignUpForm = () => {
           )}{" "}
           GitHub
       </Button>
-      <Button  variant="outline" type="button" disabled={isLoading} onClick={()=>handleSignOut()}>
-        Sign Out
-      </Button>
       {
         errorMessage!="" && (
           <p className="text-red-500">{errorMessage}</p> 
+        )
+      }
+      {
+        signUpSuccess!=false && (
+          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
+          <p className="font-bold">Signup Successful</p>
+          <p>Your accout has been created. Proceed to login</p>
+        </div>
         )
       }
       </div>
